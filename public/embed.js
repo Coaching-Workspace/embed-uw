@@ -11,10 +11,13 @@ var classes = {
     wuw: 'w-uw',
     w100: 'w-100',
     wfill: 'w-fill',
+    wfs: 'w-full-screen',
 }
 var postmessage = {
     validateClose: 'requestValidateClosedUW',
-    closed: 'responseClosedUw'
+    closed: 'responseClosedUw',
+    openImage: 'reqOpenImage',
+    closedImage: 'resCloseImage',
 }
 
 if (document.body && !document.getElementById(tagIds.iframe)) {
@@ -30,9 +33,10 @@ function generateStyle() {
     style.id = tagIds.style;
     style.innerHTML = `
     .w-100 { width: 100%; height: min(870px, 80%); } .w-fill { width: 100px; height: 100px; } .w-uw { width: 446px; height: min(870px, 80%); }
+    .w-full-screen { width: 100%, height: 100%; }
     #hook-iframe { 
         position: fixed !important; bottom: 0px !important; right: 0px !important; border: none !important; z-index: 100000 !important;
-        rgba(0, 0, 0, 0.1) -55px -45px 25px -55px
+        box-shadow: rgba(0, 0, 0, 0.1) -55px -45px 25px -55px;
     }
     `;
     document.head.insertBefore(style, document.head.firstElementChild);
@@ -64,7 +68,7 @@ function generateIframe() {
         iframe.id = tagIds.iframe;
         iframe.title = title;
         iframe.src = `${endpoint}/?${pipe(buildQueryString, convertIterableToArray)(qs.entries())}`;
-        iframe.className = classes.wuw;
+        iframe.className = classes.wfill;
         document.body.appendChild(iframe);
         // push message to uw
         setTimeout(() => {
@@ -94,6 +98,12 @@ window.addEventListener("message", (event) => {
     switch (name) {
         case postmessage.closed:
             iframe.className = isClosed ? classes.wfill : `${resizeFixedUW ? classes.wuw : classes.w100}`;
+            break;
+        case postmessage.openImage:
+            iframe.className = classes.wfs;
+            break;
+        case postmessage.closedImage:
+            iframe.className = classes.wuw;
             break;
         default:
             break;
