@@ -35,10 +35,11 @@ function generateStyle() {
     style.type = types.css;
     style.id = tagIds.style;
     style.innerHTML = `
-    .w-100 { width: 100%; height: min(870px, 88%); }
     .w-fill { width: 100px; height: 100px; }
+    .w-100 { width: 100%; height: min(870px, 88%); }
     .w-uw { width: 446px; height: min(870px, 88%); }
-    .w-hv { width: 550px; height: min(870px, 88%); }
+    .w-hv { width: 446px; height: min(870px, 88%); transition: width 1s; }
+    .w-hv:hover { width: 550px; transition-timing-function: ease-in; }
     .w-fs { width: 100%; height: 100%; }
 
     #hook-iframe { 
@@ -75,28 +76,29 @@ function generateIframe() {
         iframe.id = tagIds.iframe;
         iframe.title = title;
         iframe.src = `${endpoint}/?${pipe(buildQueryString, convertIterableToArray)(qs.entries())}`;
-        iframe.className = classes.wfill;
-        iframe.style.cssText = boxShadow;
+        iframe.className = classes.wuw;
+        iframe.style.cssText = 'display: none';
 
         iframe.onmouseover = () => {
-            if (!isClosedUW) {
+            if (!isClosedUW && !iframe.className.includes(classes.wfs)) {
                 iframe.className = classes.whv;
                 iframe.style.cssText = '';
             }
         }
         iframe.onmouseout = () => {
-            if (!isClosedUW) {
+            if (!isClosedUW && !iframe.className.includes(classes.wfs)) {
                 setTimeout(() => {
                     iframe.className = classes.wuw;
                     iframe.style.cssText = boxShadow;
                 }, 200)
             }
         }
+       
         document.body.appendChild(iframe);
         // push message to uw
         setTimeout(() => {
             resizeWindow();
-        }, 2000)
+        }, 4000)
     }
 }
 
@@ -115,6 +117,7 @@ window.addEventListener("message", (event) => {
         case postmessage.closed:
             isClosedUW = isClosed;
             iframe.className = isClosed ? classes.wfill : `${resizeFixedUW ? classes.wuw : classes.w100}`;
+            iframe.style.cssText = !isClosed ? boxShadow : '';
             break;
         case postmessage.openImage:
             iframe.className = classes.wfs;
