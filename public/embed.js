@@ -77,7 +77,14 @@ function generateIframe() {
         iframe.title = title;
         iframe.src = `${endpoint}/?${pipe(buildQueryString, convertIterableToArray)(qs.entries())}`;
         iframe.className = classes.whv;
+        iframe.key = 'uniq-universal-widget'
         iframe.style.cssText = 'display: none';
+        iframe.sandbox.add('allow-scripts');
+        iframe.sandbox.add('allow-forms');
+        iframe.sandbox.add('allow-modals');
+        iframe.sandbox.add('allow-popups');
+        iframe.sandbox.add('allow-same-origin');
+        iframe.sandbox.add("allow-popups-to-escape-sandbox");
 
         document.body.appendChild(iframe);
         // push message to uw
@@ -108,14 +115,6 @@ window.addEventListener("message", (event) => {
             break;
         case postmessage.closedImage:
             iframe.className = classes.wuw;
-            break;
-        case postmessage.hoverTooltip:
-            iframe.className = classes.whv;
-            iframe.style.cssText = '';
-            break;
-        case postmessage.closeTooltip:
-            iframe.className = classes.wuw;
-            iframe.style.cssText = boxShadow;
             break;
         default:
             break;
